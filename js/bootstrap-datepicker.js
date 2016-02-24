@@ -30,6 +30,8 @@
   }
 }(function($, undefined){
 
+  var DATE_MAX = 8640000000000000;
+
   function UTCDate(){
     return new Date(Date.UTC.apply(Date, arguments));
   }
@@ -50,7 +52,8 @@
     };
   }
   function isValidDate(d) {
-    return d && !isNaN(d.getTime());
+    console.log('#isValidDate');
+    return d && /* !isNaN(d.getTime()) */ DATE_MAX > d.getTime();
   }
 
   var DateArray = (function(){
@@ -246,7 +249,7 @@
       o.weekEnd = (o.weekStart + 6) % 7;
 
       var format = DPGlobal.parseFormat(o.format);
-      if (o.startDate !== -Infinity){
+      if (o.startDate !== -DATE_MAX){
         if (!!o.startDate){
           if (o.startDate instanceof Date)
             o.startDate = this._local_to_utc(this._zero_time(o.startDate));
@@ -254,10 +257,10 @@
             o.startDate = DPGlobal.parseDate(o.startDate, format, o.language, o.assumeNearbyYear);
         }
         else {
-          o.startDate = -Infinity;
+          o.startDate = -DATE_MAX;
         }
       }
-      if (o.endDate !== Infinity){
+      if (o.endDate !== DATE_MAX){
         if (!!o.endDate){
           if (o.endDate instanceof Date)
             o.endDate = this._local_to_utc(this._zero_time(o.endDate));
@@ -265,7 +268,7 @@
             o.endDate = DPGlobal.parseDate(o.endDate, format, o.language, o.assumeNearbyYear);
         }
         else {
-          o.endDate = Infinity;
+          o.endDate = DATE_MAX;
         }
       }
 
@@ -781,6 +784,7 @@
 
     _allow_update: true,
     update: function(){
+      console.log('#update');
       if (!this._allow_update)
         return this;
 
@@ -997,10 +1001,10 @@
       var d = new Date(this.viewDate),
           year = d.getUTCFullYear(),
           month = d.getUTCMonth(),
-          startYear = this.o.startDate !== -Infinity ? this.o.startDate.getUTCFullYear() : -Infinity,
-          startMonth = this.o.startDate !== -Infinity ? this.o.startDate.getUTCMonth() : -Infinity,
-          endYear = this.o.endDate !== Infinity ? this.o.endDate.getUTCFullYear() : Infinity,
-          endMonth = this.o.endDate !== Infinity ? this.o.endDate.getUTCMonth() : Infinity,
+          startYear = this.o.startDate !== -DATE_MAX ? this.o.startDate.getUTCFullYear() : -DATE_MAX,
+          startMonth = this.o.startDate !== -DATE_MAX ? this.o.startDate.getUTCMonth() : -DATE_MAX,
+          endYear = this.o.endDate !== DATE_MAX ? this.o.endDate.getUTCFullYear() : DATE_MAX,
+          endMonth = this.o.endDate !== DATE_MAX ? this.o.endDate.getUTCMonth() : DATE_MAX,
           todaytxt = dates[this.o.language].today || dates['en'].today || '',
           cleartxt = dates[this.o.language].clear || dates['en'].clear || '',
           titleFormat = dates[this.o.language].titleFormat || dates['en'].titleFormat,
@@ -1169,13 +1173,13 @@
           month = d.getUTCMonth();
       switch (this.viewMode){
       case 0:
-        if (this.o.startDate !== -Infinity && year <= this.o.startDate.getUTCFullYear() && month <= this.o.startDate.getUTCMonth()){
+        if (this.o.startDate !== -DATE_MAX && year <= this.o.startDate.getUTCFullYear() && month <= this.o.startDate.getUTCMonth()){
           this.picker.find('.prev').css({visibility: 'hidden'});
         }
         else {
           this.picker.find('.prev').css({visibility: 'visible'});
         }
-        if (this.o.endDate !== Infinity && year >= this.o.endDate.getUTCFullYear() && month >= this.o.endDate.getUTCMonth()){
+        if (this.o.endDate !== DATE_MAX && year >= this.o.endDate.getUTCFullYear() && month >= this.o.endDate.getUTCMonth()){
           this.picker.find('.next').css({visibility: 'hidden'});
         }
         else {
@@ -1186,13 +1190,13 @@
       case 2:
       case 3:
       case 4:
-        if (this.o.startDate !== -Infinity && year <= this.o.startDate.getUTCFullYear() || this.o.maxViewMode < 2){
+        if (this.o.startDate !== -DATE_MAX && year <= this.o.startDate.getUTCFullYear() || this.o.maxViewMode < 2){
           this.picker.find('.prev').css({visibility: 'hidden'});
         }
         else {
           this.picker.find('.prev').css({visibility: 'visible'});
         }
-        if (this.o.endDate !== Infinity && year >= this.o.endDate.getUTCFullYear() || this.o.maxViewMode < 2){
+        if (this.o.endDate !== DATE_MAX && year >= this.o.endDate.getUTCFullYear() || this.o.maxViewMode < 2){
           this.picker.find('.next').css({visibility: 'hidden'});
         }
         else {
@@ -1416,11 +1420,13 @@
         // If going back one month, make sure month is not current month
         // (eg, Mar 31 -> Feb 31 == Feb 28, not Mar 02)
           ? function(){
+            console.log('#test', 1);
             return new_date.getUTCMonth() === month;
           }
         // If going forward one month, make sure month is as expected
         // (eg, Jan 31 -> Feb 31 == Feb 28, not Mar 02)
         : function(){
+          console.log('#test', 2);
           return new_date.getUTCMonth() !== new_month;
         };
         new_month = month + dir;
@@ -1438,12 +1444,14 @@
         new_month = new_date.getUTCMonth();
         new_date.setUTCDate(day);
         test = function(){
+          console.log('#test', 3);
           return new_month !== new_date.getUTCMonth();
         };
       }
       // Common date-resetting loop -- if date is beyond end of month, make it
       // end of month
       while (test()){
+        console.log(1);
         new_date.setUTCDate(--day);
         new_date.setUTCMonth(new_month);
       }
@@ -1784,7 +1792,7 @@
     daysOfWeekDisabled: [],
     daysOfWeekHighlighted: [],
     datesDisabled: [],
-    endDate: Infinity,
+    endDate: DATE_MAX,
     forceParse: true,
     format: 'mm/dd/yyyy',
     keyboardNavigation: true,
@@ -1795,7 +1803,7 @@
     multidateSeparator: ',',
     orientation: "auto",
     rtl: false,
-    startDate: -Infinity,
+    startDate: -DATE_MAX,
     startView: 0,
     todayBtn: false,
     todayHighlight: false,
@@ -1867,6 +1875,7 @@
     validParts: /dd?|DD?|mm?|MM?|yy(?:yy)?/g,
     nonpunctuation: /[^ -\/:-@\u5e74\u6708\u65e5\[-`{-~\t\n\r]+/g,
     parseFormat: function(format){
+      console.log('#parseFormat');
       if (typeof format.toValue === 'function' && typeof format.toDisplay === 'function')
         return format;
       // IE treats \0 as a string end in inputs (truncating the value),
@@ -1879,6 +1888,7 @@
       return {separators: separators, parts: parts};
     },
     parseDate: function(date, format, language, assumeNearby){
+      // console.log('#parseDate');
       if (!date)
         return undefined;
       if (date instanceof Date)
@@ -1952,23 +1962,48 @@
           setters_order = ['yyyy', 'yy', 'M', 'MM', 'm', 'mm', 'd', 'dd'],
           setters_map = {
             yyyy: function(d,v){
+              console.log('#yyyy', d, v);
               return d.setUTCFullYear(assumeNearby ? applyNearbyYear(v, assumeNearby) : v);
             },
             yy: function(d,v){
+              console.log('#yy', d, v);
               return d.setUTCFullYear(assumeNearby ? applyNearbyYear(v, assumeNearby) : v);
             },
             m: function(d,v){
-              if (isNaN(d))
+              console.log('#m', d, v);
+              if (!isValidDate(d)) {
+                console.log(' ', 'invalid');
                 return d;
+              } else {
+                console.log(' ', 'valid');
+              }
               v -= 1;
               while (v < 0) v += 12;
               v %= 12;
-              d.setUTCMonth(v);
-              while (d.getUTCMonth() !== v)
+              var newDate = new Date(d);
+              newDate.setUTCMonth(v);
+              if (!isValidDate(newDate)) {
+                console.log(' ', 'invalid 2', newDate > 0);
+                return d = (newDate > 0) ? new Date(0) : new Date(-DATE_MAX);
+              } else {
+                console.log(' ', 'valid 2');
+                d.setTime(newDate.getTime());
+              }
+              console.log(' ', d, d.getUTCMonth(), v, d.getUTCMonth() !== v);
+              while (d.getUTCMonth() !== v) {
+                console.log(1);
                 d.setUTCDate(d.getUTCDate()-1);
+                // if (!isValidDate(d)) {
+                //   console.log(' ', 'invalid 3');
+                //   return origDate > 0 ? new Date(DATE_MAX) : new Date(-DATE_MAX);
+                // } else {
+                //   console.log(' ', 'valid 3');
+                // }
+              }
               return d;
             },
             d: function(d,v){
+              console.log('#d', d, v);
               return d.setUTCDate(v);
             }
           },
@@ -2013,8 +2048,10 @@
           s = setters_order[i];
           if (s in parsed && !isNaN(parsed[s])){
             _date = new Date(date);
+            console.log('@before', _date);
             setters_map[s](_date, parsed[s]);
-            if (!isNaN(_date))
+            console.log('@after', _date);
+            if (isValidDate(_date))
               date = _date;
           }
         }

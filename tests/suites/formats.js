@@ -226,8 +226,68 @@ test('Regression: End-of-month bug', patch_date(function(Date){
     equal(this.input.val(), '29-02-2012');
 }));
 
-test('Invalid formats are force-parsed into a valid date on tab', patch_date(function(Date){
+test('Invalid range date are force-parsed into a valid range on tab', patch_date(function(Date){
     Date.now = UTCDate(2012, 4, 31);
+    this.input
+        .val('275760-08-01')
+        .datepicker({format: 'yyyy-MM-dd'})
+        .focus();
+
+    this.input.trigger({
+        type: 'keydown',
+        keyCode: 9
+    });
+
+    equal(this.input.val(), 'TODO');
+}));
+
+test('Invalid range date are force-parsed into a valid range on tab', patch_date(function(Date){
+    Date.now = UTCDate(2012, 4, 31);
+    this.input
+        .val('275760-10-01')
+        .datepicker({format: 'yyyy-MM-dd'})
+        .focus();
+
+    this.input.trigger({
+        type: 'keydown',
+        keyCode: 9
+    });
+
+    equal(this.input.val(), 'TODO');
+}));
+
+test('Invalid range date are force-parsed into a valid range on tab', patch_date(function(Date){
+    Date.now = UTCDate(2012, 10, 31);
+    this.input
+        .val('275760-10-01')
+        .datepicker({format: 'yyyy-MM-dd'})
+        .focus();
+
+    this.input.trigger({
+        type: 'keydown',
+        keyCode: 9
+    });
+
+    equal(this.input.val(), 'TODO');
+}));
+
+test('Invalid range date are force-parsed into a valid range on tab', patch_date(function(Date){
+    Date.now = UTCDate(2012, 11, 31);
+    this.input
+        .val('275760-10-01')
+        .datepicker({format: 'yyyy-MM-dd'})
+        .focus();
+
+    this.input.trigger({
+        type: 'keydown',
+        keyCode: 9
+    });
+
+    equal(this.input.val(), 'TODO');
+}));
+
+test('Invalid formats are force-parsed into a valid date on tab', patch_date(function(Date){
+    Date.now = UTCDate(2012, 12, 31);
     this.input
         .val('44-44-4444')
         .datepicker({format: 'yyyy-MM-dd'})

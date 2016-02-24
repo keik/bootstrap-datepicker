@@ -1,5 +1,6 @@
 {
     // Extra globals.
+    "devel": true,
     "predef" : [
       "require",
       "define",
